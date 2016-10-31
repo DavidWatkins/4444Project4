@@ -1,8 +1,9 @@
 #----------------------------------------------------------
 # File meshes.py
 #----------------------------------------------------------
-import bpy
+# import bpy
 import math
+import matplotlib.pyplot as plt
  
 def createMesh(name, origin, verts, edges, faces):
     # Create mesh and object
@@ -29,7 +30,10 @@ def getAnglesFor(n):
         angles.append((2**i) * 2 * math.pi/denom)
     return angles
 
-def getXYVertsForAngles(angles, radius=1):
+def getDistance(x1, x2):
+    return math.sqrt((x1[0] - x2[0]) ** 2 + (x1[1] - x2[1]) ** 2)
+
+def getXYVertsForAngles(angles, radius=1, width=3):
     #First point:
     pointOrigin = (0,0)
     pointCurrent = (0, radius)
@@ -40,6 +44,7 @@ def getXYVertsForAngles(angles, radius=1):
         oo = math.atan2(pointCurrent[1] - pointOrigin[1], pointCurrent[0] - pointOrigin[0])
         oo = oo + angleOpposite
         d = getDistance(pointCurrent, pointOrigin) * math.sin(angleOpposite) / math.sin(math.pi - angleOpposite - angle)
+        print(str(oo) + " " + str(d) + " " + str(angle/math.pi) + " " + str(angleOpposite/math.pi))
         pointCurrent = (pointCurrent[0] + d * math.cos(oo), pointCurrent[1] + d * math.sin(oo))
         points.append(pointCurrent)
 
@@ -51,12 +56,11 @@ def getXYVertsForAngles(angles, radius=1):
         pointTop = (point[0], point[1], width/2)
         pointBottom = (point[0], point[1], -width/2)
         points3D.append(pointTop)
-        points3D.append(pointBottom3D)
+        points3D.append(pointBottom)
 
         faces.append((0, index - 2, index))
         faces.append((0, index - 1, index + 1))
-        faces.append((index-2, index-1, index))
-        faces.append((index-1, index, index+1))
+        faces.append((index-2, index-1, index, index+1))
 
         index += 2
 
@@ -70,8 +74,19 @@ def run(origin, n, radius=1, width=3):
     angles = getAnglesFor(n)
     verts, faces = getXYVertsForAngles(angles)
 
-    ob1 = createMesh('Die', origin, verts, [], faces)
+    xs = []
+    ys = []
+    for vert in verts:
+        xs.append(vert[0])
+        ys.append(vert[1])
+    plt.plot(xs, ys, 'ro')
+    plt.show()
+
+
+    print(verts)
+    print(faces)
+    # ob1 = createMesh('Die', origin, verts, [], faces)
     return
  
 if __name__ == "__main__":
-    run((0,0,0), 3)
+    run((0,0,0), 6)
