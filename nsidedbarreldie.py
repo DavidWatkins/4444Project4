@@ -44,30 +44,33 @@ def getXYVertsForAngles(angles, radius=1):
         points.append(pointCurrent)
 
     faces = []
-    points3DTop = []
-    points3DBottom = []
+    points3D = [(0,0,width/2), (0,0,-width/2), (points[1][0], points[1][1], width/2), (points[1][0], points[1][1], -width/2)]
     pointOrigin = points[0]
-    for point in points[1:]:
+    index = 4
+    for point in points[2:]:
         pointTop = (point[0], point[1], width/2)
-        pointBottom = (point[0], point[1], 1-width/2)
-        points3D.append(pointTop, pointBottom)
-        
+        pointBottom = (point[0], point[1], -width/2)
+        points3D.append(pointTop)
+        points3D.append(pointBottom3D)
 
+        faces.append((0, index - 2, index))
+        faces.append((0, index - 1, index + 1))
+        faces.append((index-2, index-1, index))
+        faces.append((index-1, index, index+1))
 
+        index += 2
+
+    faces.append((0, 2, index - 2))
+    faces.append((0, 3, index - 1))
+    faces.append((2, 3, index - 2, index - 1)) # Add side face
+
+    return points3D, faces
  
 def run(origin, n, radius=1, width=3):
     angles = getAnglesFor(n)
-    getXYVertsForAngles(angles)
+    verts, faces = getXYVertsForAngles(angles)
 
-    (x,y,z) = (0.707107, 0.258819, 0.965926)
-    verts1 = ((x,x,-1), (x,-x,-1), (-x,-x,-1), (-x,x,-1), (0,0,1))
-    faces1 = ((1,0,4), (4,2,1), (4,3,2), (4,0,3), (0,1,2,3))
-    ob1 = createMesh('Solid', origin, verts1, [], faces1)
- 
-    # Move second object out of the way
-    ob1.select = False
-    ob2.select = True
-    bpy.ops.transform.translate(value=(0,2,0))
+    ob1 = createMesh('Die', origin, verts, [], faces)
     return
  
 if __name__ == "__main__":
